@@ -16,11 +16,18 @@ func New() *echo.Echo {
 		AllowMethods: []string{http.MethodGet, http.MethodPost},
 	}))
 
-	e.GET("/", mainPage)
-	e.POST("/vote", handlers.HandleVote)
+	//websocket
+	go handlers.HandleBroadcast()
+
+	//POST
+	//e.POST("/vote", handlers.CastVote)
+	e.POST("/create-session", handlers.CreateSession)
+	//e.POST("/clear-votes", handlers.ClearVotes)
+
+	//GET
+	e.GET("/join-session", handlers.JoinSession)
+	//e.GET("/results", handlers.GetResults)
+	e.GET("/ws/:sessionId", handlers.HandleConnections)
 
 	return e
-}
-func mainPage(c echo.Context) error {
-	return c.String(http.StatusOK, "Hello, World!")
 }
