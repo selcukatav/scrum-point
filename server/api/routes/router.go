@@ -16,11 +16,11 @@ func New() *echo.Echo {
 		AllowMethods: []string{http.MethodGet, http.MethodPost},
 	}))
 
-	//websocket
+	//open channel
 	go handlers.HandleBroadcast()
 
 	//POST
-	//e.POST("/vote", handlers.CastVote)
+	e.POST("/vote", handlers.CastVote)
 	e.POST("/create-session", handlers.CreateSession)
 	//e.POST("/clear-votes", handlers.ClearVotes)
 

@@ -8,24 +8,31 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+type Client struct {
+	Id   string
+	Conn *websocket.Conn
+}
+
+type VoteMessage struct {
+	Type     string `json:"type"`
+	Size     string `json:"size,omitempty"`
+	ClientId string `json:"clientId"`
+}
+
 var upgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool {
 		return true
 	},
 }
+var (
+	clients     = make(map[*websocket.Conn]bool)
+	broadcast   = make(chan VoteMessage)
+	votes       = make(map[string]int)
+	clientVotes = make(map[string]string)
+	mutex       = &sync.Mutex{}
+)
 
-var clients = make(map[*websocket.Conn]bool)
-var broadcast = make(chan VoteMessage)
-
-type VoteMessage struct {
-	Type string `json:"type"`
-	Size string `json:"size,omitempty"`
-}
-
-var userVotes = make(map[*websocket.Conn]string)
-var votes = make(map[string]int)
-var mutex = &sync.Mutex{}
-
+// opens websocket connection with clients that want to connect
 func HandleConnections(c echo.Context) error {
 	ws, err := upgrader.Upgrade(c.Response(), c.Request(), nil)
 	if err != nil {
@@ -37,7 +44,6 @@ func HandleConnections(c echo.Context) error {
 	defer func() {
 		delete(clients, ws)
 	}()
-
 	for {
 		var msg VoteMessage
 		err := ws.ReadJSON(&msg)
@@ -50,62 +56,43 @@ func HandleConnections(c echo.Context) error {
 	return nil
 }
 
+// handles the message coming from clients thru ws
 func HandleBroadcast() {
 	for {
 		msg := <-broadcast
 		mutex.Lock()
 
 		switch msg.Type {
-		case "vote":
-			
-			for client := range clients {
-				if userVotes[client] != "" {
-					votes[userVotes[client]]--
-				}
-				userVotes[client] = msg.Size
-				votes[msg.Size]++
-			}
 		case "clear-votes":
 
 			votes = make(map[string]int)
-			userVotes = make(map[*websocket.Conn]string)
+			clientVotes = make(map[string]string)
 
-			for client := range clients {
-				err := client.WriteJSON(map[string]interface{}{
-					"type":            "clear",
-					"votes":           votes,
-					"highlightedCard": "",
-				})
-				if err != nil {
-					client.Close()
-					delete(clients, client)
-				}
-			}
-			broadcastVotes()
+			data := map[string]interface{}{}
+
+			broadcastToClients("clear", data)
+
 		case "show-results":
 			mostVotedCard := getMostVotedCard()
-			for client := range clients {
-				err := client.WriteJSON(map[string]interface{}{
-					"type":          "highlight",
-					"mostVotedCard": mostVotedCard,
-				})
-				if err != nil {
-					client.Close()
-					delete(clients, client)
-				}
-			}
-		}
+			allVotes := votes
+			data := map[string]interface{}{
 
-		mutex.Unlock()
+				"mostVotedCard": mostVotedCard,
+				"votes":         allVotes,
+			}
+
+			broadcastToClients("highlight", data)
+
+			mutex.Unlock()
+		}
 	}
 }
 
-func broadcastVotes() {
+func broadcastToClients(messageType string, data map[string]interface{}) {
+
 	for client := range clients {
-		err := client.WriteJSON(map[string]interface{}{
-			"type":  "votes",
-			"votes": votes,
-		})
+		data["type"] = messageType
+		err := client.WriteJSON(data)
 		if err != nil {
 			client.Close()
 			delete(clients, client)
