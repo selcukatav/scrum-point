@@ -1,4 +1,4 @@
-import Cards from '../../components/MainPage/cards';
+import Cards from '../../components/CardsPage/cards';
 
 
 const CardsPage: React.FC = () => {

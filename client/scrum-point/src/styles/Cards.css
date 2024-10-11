@@ -1,53 +1,95 @@
-
 .Cards {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
-    width: 100%;
-    text-align: center;
-  }
-  .highlighted {
-    background-color: #ffeb3b;
-    border-color: #ff9800;
-    color: #000;
-    font-weight: bold;
-  }
-  
-  .card-container {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    margin-bottom: 20px;
-  }
-  
-  .card {
-    padding: 15px 20px;
-    font-size: 16px;
-    border: 2px solid #000;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-  }
-  
-  .card:hover {
-    background-color: #f0f0f0;
-  }
-  
-  .selected {
-    background-color: #4CAF50;
-    color: white;
-  }
-  
-  button {
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
-  }
-  
-  button:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
-  }
-  
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  text-align: center;
+}
+.highlighted {
+  background-color: #ffeb3b;
+  border-color: #ff9800;
+  color: #000;
+  font-weight: bold;
+}
+
+.card-container {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.card {
+  padding: 15px 20px;
+  font-size: 16px;
+  border: 2px solid #000;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.card:hover {
+  background-color: #f0f0f0;
+}
+
+.selected {
+  background-color: #4CAF50;
+  color: white;
+}
+
+button {
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.card:disabled {
+  background-color: #e0e0e0;
+  color: #888888;
+  border-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.input-box {
+  display: flex;
+  justify-content: center;
+  width: 50rem;
+  height: 2rem;
+  border-radius: 15px;
+}
+
+.button-container {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  width: 15em;
+  height: 3em;
+}
+
+.save-button {
+  width: 15rem;
+  height: 5rem;
+  font-size: 20px;
+  margin-top: 10px;
+}
+.saved-votes {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 10px;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.saved-votes ul {
+  list-style: none;
+  padding: 0;
+}
+
+.saved-votes li {
+  margin-bottom: 5px;
+  font-size: 14px;
+}
