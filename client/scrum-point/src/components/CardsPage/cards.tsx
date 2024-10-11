@@ -44,14 +44,14 @@ const Cards: React.FC = () => {
       if (data.type === 'highlight') {
         setHighlightedCard(data.mostVotedCard);
         setVotes(data.votes);
-        
+
         setIsVotingDisabled(true)
 
       }
 
       if (data.type === 'save-vote') {
-        setSavedVotes((prevVotes) => [...prevVotes, data.vote]);
-    }
+        setSavedVotes((prevVotes) => [...prevVotes, { taskName: data.taskName, size: data.vote }]);
+      }
 
     };
 
@@ -70,20 +70,55 @@ const Cards: React.FC = () => {
   const handleExcelExport = async () => {
     try {
       const response = await axios.post('http://localhost:3000/export', savedVotes, {
-          responseType: 'blob'
+        responseType: 'blob'
       });
 
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement('a');
       link.href = url;
-      link.setAttribute('download', 'votes.xlsx'); 
+      link.setAttribute('download', 'votes.xlsx');
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-  } catch (error) {
+    } catch (error) {
       console.error('Excel dosyası oluşturulurken hata oluştu:', error);
-  }
-};
+    }
+  };
+
+  
+
+  const handleShowResults = () => {
+    sendWebSocketMessage('show-results')
+  };
+
+  const handleClearVotes = async () => {
+    sendWebSocketMessage('clear-votes')
+  };
+
+  const handleSaveVote = () => {
+    const ws = new WebSocket(`ws://localhost:3000/ws/${sessionId}`);
+
+
+    if (taskName && highlightedCard) {
+      const newVote: SavedVote = { taskName, size: highlightedCard };
+
+      setSavedVotes((prevVotes) => {
+        const updatedVotes = [...prevVotes, newVote];
+
+        ws.onopen = () => {
+          ws.send(JSON.stringify({ type: 'save-vote', vote: newVote }));
+        }
+        ws.onerror = (error) => {
+          console.error("WebSocket error: ", error);
+        };
+
+        return updatedVotes;
+      });
+
+      setTaskName('');
+      setSelectedSize(null);
+    }
+  };
 
   const handleSelectSize = async (size: string, clientId: string | null) => {
     if (!clientId) {
@@ -100,44 +135,11 @@ const Cards: React.FC = () => {
       const { selectedSize } = response.data;
       setSelectedSize(selectedSize);
 
-      console.log(selectedSize)
-      console.log(response.data)
 
     } catch (error) {
       console.error('There was an error while sending the vote', error);
     }
   };
-
-  const handleShowResults = () => {
-    sendWebSocketMessage('show-results')
-  };
-
-  const handleClearVotes = async () => {
-    sendWebSocketMessage('clear-votes')
-  };
-
-  const handleSaveVote = () => {
-    const ws = new WebSocket(`ws://localhost:3000/ws/${sessionId}`);
-    console.log(taskName)
-    console.log(selectedSize)
-
-    if (taskName && selectedSize) {
-        const newVote: SavedVote = { taskName, size: selectedSize };
-        
-        setSavedVotes((prevVotes) => {
-            const updatedVotes = [...prevVotes, newVote];
-
-            if (ws && ws.readyState === WebSocket.OPEN) {
-                ws.send(JSON.stringify({ type: 'save-vote', vote: newVote }));
-            }
-
-            return updatedVotes;
-        });
-
-        setTaskName('');
-        setSelectedSize(null);
-    }
-};
 
 
   const sendWebSocketMessage = (messageType: string) => {
@@ -179,7 +181,7 @@ const Cards: React.FC = () => {
             key={size}
             onClick={() => handleSelectSize(size, clientId)}
             className={`card ${selectedSize === size ? 'selected' : ''} ${highlightedCard === size ? 'highlighted' : ''}`}
-            disabled={isVotingDisabled && highlightedCard !== size} 
+            disabled={isVotingDisabled && highlightedCard !== size}
           >
             {size}
             <div>{votes[size] || 0} votes </div>
@@ -199,13 +201,17 @@ const Cards: React.FC = () => {
         <h3>Kaydedilen Oylamalar</h3>
         <ul>
           {savedVotes.map((vote, index) => (
-            <li key={index}>{vote.taskName} - {vote.size}</li>
+            <li key={index}>
+              <span className="task-name">{vote.taskName}</span>
+              <span className="size">{vote.size}</span>
+            </li>
           ))}
         </ul>
         <button onClick={handleExcelExport}>
           Excel'e Aktar
         </button>
       </div>
+
     </div>
   );
 };
