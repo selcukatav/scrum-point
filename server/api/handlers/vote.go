@@ -7,6 +7,7 @@ import (
 )
 
 // handles casting vote from user. blocks multiple casts in one vote
+
 func CastVote(c echo.Context) error {
 
 	req := new(VoteMessage)

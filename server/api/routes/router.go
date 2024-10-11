@@ -16,12 +16,13 @@ func New() *echo.Echo {
 		AllowMethods: []string{http.MethodGet, http.MethodPost},
 	}))
 
-	//open channel
+	//open channel for ws
 	go handlers.HandleBroadcast()
 
 	//POST
 	e.POST("/vote", handlers.CastVote)
 	e.POST("/create-session", handlers.CreateSession)
+	e.POST("/export", handlers.ExportExcel)
 	//e.POST("/clear-votes", handlers.ClearVotes)
 
 	//GET

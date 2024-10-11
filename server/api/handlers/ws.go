@@ -60,7 +60,6 @@ func HandleConnections(c echo.Context) error {
 func HandleBroadcast() {
 	for {
 		msg := <-broadcast
-		mutex.Lock()
 
 		switch msg.Type {
 		case "clear-votes":
@@ -68,7 +67,9 @@ func HandleBroadcast() {
 			votes = make(map[string]int)
 			clientVotes = make(map[string]string)
 
-			data := map[string]interface{}{}
+			data := map[string]interface{}{
+				"votes": votes,
+			}
 
 			broadcastToClients("clear", data)
 
@@ -83,7 +84,13 @@ func HandleBroadcast() {
 
 			broadcastToClients("highlight", data)
 
-			mutex.Unlock()
+		case "save-vote":
+			vote := getMostVotedCard()
+			data := map[string]interface{}{
+				"vote": vote,
+			}
+			broadcastToClients("save-vote", data)
+
 		}
 	}
 }
