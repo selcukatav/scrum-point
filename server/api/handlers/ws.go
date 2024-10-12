@@ -56,7 +56,7 @@ func HandleConnections(c echo.Context) error {
 	return nil
 }
 
-// handles the message coming from clients thru ws
+// handles the message coming from clients through ws
 func HandleBroadcast() {
 	for {
 		msg := <-broadcast
@@ -77,7 +77,6 @@ func HandleBroadcast() {
 			mostVotedCard := getMostVotedCard()
 			allVotes := votes
 			data := map[string]interface{}{
-
 				"mostVotedCard": mostVotedCard,
 				"votes":         allVotes,
 			}
