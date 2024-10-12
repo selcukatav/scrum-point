@@ -83,12 +83,12 @@ func HandleBroadcast() {
 
 			broadcastToClients("highlight", data)
 
-		case "save-vote":
-			vote := getMostVotedCard()
-			data := map[string]interface{}{
-				"vote": vote,
-			}
-			broadcastToClients("save-vote", data)
+		// case "save-vote":
+		// 	vote := getMostVotedCard()
+		// 	data := map[string]interface{}{
+		// 		"vote": vote,
+		// 	}
+		// 	broadcastToClients("save-vote", data)
 
 		}
 	}

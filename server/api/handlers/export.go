@@ -52,3 +52,21 @@ func ExportExcel(c echo.Context) error {
 
 	return f.Write(c.Response().Writer)
 }
+func SaveVote(c echo.Context) error {
+    var requestData struct {
+        SessionId string `json:"sessionId"`
+        Vote      VoteList   `json:"vote"`
+    }
+
+    if err := c.Bind(&requestData); err != nil {
+        return c.JSON(http.StatusBadRequest, map[string]string{
+            "message": "Geçersiz veri formatı",
+        })
+    }
+    savedVote := requestData.Vote
+    c.Logger().Infof("Oylama kaydedildi: %v", savedVote)
+
+    return c.JSON(http.StatusOK, map[string]string{
+        "message": "Oylama başarıyla kaydedildi",
+    })
+}

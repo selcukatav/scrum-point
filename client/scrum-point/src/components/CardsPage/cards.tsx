@@ -49,9 +49,9 @@ const Cards: React.FC = () => {
 
       }
 
-      if (data.type === 'save-vote') {
-        setSavedVotes((prevVotes) => [...prevVotes, { taskName: data.taskName, size: data.vote }]);
-      }
+      // if (data.type === 'save-vote') {
+      //   setSavedVotes((prevVotes) => [...prevVotes, data.vote ]);
+      // }
 
     };
 
@@ -95,30 +95,53 @@ const Cards: React.FC = () => {
     sendWebSocketMessage('clear-votes')
   };
 
-  const handleSaveVote = () => {
-    const ws = new WebSocket(`ws://localhost:3000/ws/${sessionId}`);
-
-
+  const handleSaveVote = async () => {
     if (taskName && highlightedCard) {
       const newVote: SavedVote = { taskName, size: highlightedCard };
-
-      setSavedVotes((prevVotes) => {
-        const updatedVotes = [...prevVotes, newVote];
-
-        ws.onopen = () => {
-          ws.send(JSON.stringify({ type: 'save-vote', vote: newVote }));
+  
+      try {
+        const response = await axios.post(`http://localhost:3000/save-vote`, {
+          sessionId,
+          vote: newVote
+        });
+  
+        if (response.status === 200) {
+          setSavedVotes((prevVotes) => [...prevVotes, newVote]);
+  
+          setTaskName('');
+          setSelectedSize(null);
         }
-        ws.onerror = (error) => {
-          console.error("WebSocket error: ", error);
-        };
-
-        return updatedVotes;
-      });
-
-      setTaskName('');
-      setSelectedSize(null);
+      } catch (error) {
+        console.error('Oylama kaydedilirken bir hata oluştu:', error);
+      }
     }
   };
+
+  //TODO: must be converted to the websocket request
+  // const handleSaveVote = () => {
+  //   const ws = new WebSocket(`ws://localhost:3000/ws/${sessionId}`);
+
+
+  //   if (taskName && highlightedCard) {
+  //     const newVote: SavedVote = { taskName, size: highlightedCard };
+
+  //     setSavedVotes((prevVotes) => {
+  //       const updatedVotes = [...prevVotes, newVote];
+
+  //       ws.onopen = () => {
+  //         ws.send(JSON.stringify({ type: 'save-vote', vote: newVote }));
+  //       }
+  //       ws.onerror = (error) => {
+  //         console.error("WebSocket error: ", error);
+  //       };
+
+  //       return updatedVotes;
+  //     });
+
+  //     setTaskName('');
+  //     setSelectedSize(null);
+  //   }
+  // };
 
   const handleSelectSize = async (size: string, clientId: string | null) => {
     if (!clientId) {

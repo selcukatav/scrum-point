@@ -23,6 +23,7 @@ func New() *echo.Echo {
 	e.POST("/vote", handlers.CastVote)
 	e.POST("/create-session", handlers.CreateSession)
 	e.POST("/export", handlers.ExportExcel)
+	e.POST("/save-vote", handlers.SaveVote)
 	//e.POST("/clear-votes", handlers.ClearVotes)
 
 	//GET
