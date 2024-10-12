@@ -1,10 +1,11 @@
-import { useParams, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { useState } from 'react';
+import '../../styles/Session.css'
 
 const SessionPage = () => {
-  const { sessionId } = useParams<{ sessionId: string }>(); 
-  const navigate = useNavigate(); 
-
+  const [sessionId, setSessionId] = useState('');
+  const navigate = useNavigate();
 
   const joinSession = async () => {
     try {
@@ -17,10 +18,16 @@ const SessionPage = () => {
   };
 
   return (
-    <div>
-      <h1>Oturuma Katıl</h1>
-      <p>Session ID: {sessionId}</p>
-      <button onClick={joinSession}>Oturuma Katıl</button>
+    <div className="join-session-container">
+      <h3>Oturuma Katıl</h3>
+      <input 
+        type="text" 
+        placeholder="Session ID'yi girin" 
+        value={sessionId} 
+        onChange={(e) => setSessionId(e.target.value)} 
+        className="session-input"
+      />
+      <button onClick={joinSession} className="join-button">Oturuma Katıl</button>
     </div>
   );
 };

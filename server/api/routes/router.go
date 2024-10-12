@@ -26,7 +26,7 @@ func New() *echo.Echo {
 	//e.POST("/clear-votes", handlers.ClearVotes)
 
 	//GET
-	e.GET("/join-session", handlers.JoinSession)
+	e.GET("/join-session/:sessionId", handlers.JoinSession)
 	//e.GET("/results", handlers.GetResults)
 	e.GET("/ws/:sessionId", handlers.HandleConnections)
 
