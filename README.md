@@ -22,7 +22,7 @@ This is a **Scrum card voting** application where participants can vote on task 
 
     ```bash
     git clone https://github.com/selcukatav/scrum-point.git
-    cd scrum-voting-app
+    cd scrum-voting
     ```
 
 2. Install dependencies for both the backend and frontend:
