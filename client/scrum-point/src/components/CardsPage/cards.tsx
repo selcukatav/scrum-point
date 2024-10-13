@@ -19,6 +19,7 @@ const Cards: React.FC = () => {
   const [isVotingDisabled, setIsVotingDisabled] = useState<boolean>(false);
   const [taskName, setTaskName] = useState<string>('');
   const [savedVotes, setSavedVotes] = useState<SavedVote[]>([]);
+  const [inputError, setInputError] = useState(false);
 
   const { sessionId } = useParams<{ sessionId: string }>();
 
@@ -96,6 +97,11 @@ const Cards: React.FC = () => {
   };
 
   const handleSaveVote = async () => {
+    if (!taskName) {
+      setInputError(true); 
+      return; 
+    }
+  
     if (taskName && highlightedCard) {
       const newVote: SavedVote = { taskName, size: highlightedCard };
   
@@ -110,6 +116,7 @@ const Cards: React.FC = () => {
   
           setTaskName('');
           setSelectedSize(null);
+          setInputError(false); 
         }
       } catch (error) {
         console.error('Oylama kaydedilirken bir hata oluştu:', error);
@@ -190,12 +197,15 @@ const Cards: React.FC = () => {
         http://localhost:5173/{sessionId} </h4>
       <br />
       <input
-        type="text"
-        placeholder="Task Adı"
-        value={taskName}
-        onChange={(e) => setTaskName(e.target.value)}
-        className='input-box'
-      />
+    type="text"
+    placeholder="Task Adı"
+    value={taskName}
+    onChange={(e) => {
+      setTaskName(e.target.value);
+      if (e.target.value) setInputError(false); 
+    }}
+    className={`input-box ${inputError ? 'input-error' : ''}`} 
+  />
 
       <br />
       <div className="card-container">
