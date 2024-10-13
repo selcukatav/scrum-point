@@ -52,7 +52,11 @@ This is a **Scrum card voting** application where participants can vote on task 
     ```bash
     npm run dev
     ```
-
+**OR**
+You can use docker for to run project by writing the code below on the root directory of the project:
+```bash
+    docker-compose up --build -d
+```
 ## Usage
 
 Once both backend and frontend are running:
