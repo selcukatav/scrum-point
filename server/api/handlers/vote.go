@@ -4,13 +4,18 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
+	"github.com/selcukatav/scrum-point/api/domains"
 )
 
 // handles casting vote from user. blocks multiple casts in one vote
+var (
+	votes       = make(map[string]int)
+	clientVotes = make(map[string]string)
+)
 
 func CastVote(c echo.Context) error {
 
-	req := new(VoteMessage)
+	req := new(domains.VoteMessage)
 	if err := c.Bind(req); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{
 			"error": "Invalid Request",

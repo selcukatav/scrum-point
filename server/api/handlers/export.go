@@ -5,18 +5,15 @@ import (
 	"strconv"
 
 	"github.com/labstack/echo/v4"
+	"github.com/selcukatav/scrum-point/api/domains"
 	"github.com/xuri/excelize/v2"
 )
 
 // exports the saved list to excel.
-type VoteList struct {
-	TaskName string `json:"taskName"`
-	Size     string `json:"size"`
-}
 
 func ExportExcel(c echo.Context) error {
 
-	var voteList []VoteList
+	var voteList []domains.VoteList
 
 	if err := c.Bind(&voteList); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{
@@ -52,21 +49,22 @@ func ExportExcel(c echo.Context) error {
 
 	return f.Write(c.Response().Writer)
 }
+
 func SaveVote(c echo.Context) error {
-    var requestData struct {
-        SessionId string `json:"sessionId"`
-        Vote      VoteList   `json:"vote"`
-    }
+	var requestData struct {
+		SessionId string           `json:"sessionId"`
+		Vote      domains.VoteList `json:"vote"`
+	}
 
-    if err := c.Bind(&requestData); err != nil {
-        return c.JSON(http.StatusBadRequest, map[string]string{
-            "message": "Geçersiz veri formatı",
-        })
-    }
-    savedVote := requestData.Vote
-    c.Logger().Infof("Oylama kaydedildi: %v", savedVote)
+	if err := c.Bind(&requestData); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{
+			"message": "Geçersiz veri formatı",
+		})
+	}
+	savedVote := requestData.Vote
+	c.Logger().Infof("Oylama kaydedildi: %v", savedVote)
 
-    return c.JSON(http.StatusOK, map[string]string{
-        "message": "Oylama başarıyla kaydedildi",
-    })
+	return c.JSON(http.StatusOK, map[string]string{
+		"message": "Oylama başarıyla kaydedildi",
+	})
 }

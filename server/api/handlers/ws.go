@@ -6,18 +6,8 @@ import (
 
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
+	"github.com/selcukatav/scrum-point/api/domains"
 )
-
-type Client struct {
-	Id   string
-	Conn *websocket.Conn
-}
-
-type VoteMessage struct {
-	Type     string `json:"type"`
-	Size     string `json:"size,omitempty"`
-	ClientId string `json:"clientId"`
-}
 
 var upgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool {
@@ -26,9 +16,7 @@ var upgrader = websocket.Upgrader{
 }
 var (
 	clients     = make(map[*websocket.Conn]bool)
-	broadcast   = make(chan VoteMessage)
-	votes       = make(map[string]int)
-	clientVotes = make(map[string]string)
+	broadcast   = make(chan domains.VoteMessage)
 	mutex       = &sync.Mutex{}
 )
 
@@ -45,7 +33,7 @@ func HandleConnections(c echo.Context) error {
 		delete(clients, ws)
 	}()
 	for {
-		var msg VoteMessage
+		var msg domains.VoteMessage
 		err := ws.ReadJSON(&msg)
 		if err != nil {
 			break
@@ -83,12 +71,12 @@ func HandleBroadcast() {
 
 			broadcastToClients("highlight", data)
 
-		// case "save-vote":
-		// 	vote := getMostVotedCard()
-		// 	data := map[string]interface{}{
-		// 		"vote": vote,
-		// 	}
-		// 	broadcastToClients("save-vote", data)
+			// case "save-vote":
+			// 	vote := getMostVotedCard()
+			// 	data := map[string]interface{}{
+			// 		"vote": vote,
+			// 	}
+			// 	broadcastToClients("save-vote", data)
 
 		}
 	}
